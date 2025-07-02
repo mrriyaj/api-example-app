@@ -165,4 +165,57 @@ class HotelController extends Controller
             return response()->json($this->getSampleData());
         }
     }
+
+    /**
+     * Get currency exchange rates
+     */
+    public function getCurrencyRates()
+    {
+        try {
+            $response = Http::timeout(30)->get('http://apilayer.net/api/live', [
+                'access_key' => '2ac346fa955f7437cdc9d7ac4109ee05',
+                'currencies' => 'EUR,GBP,CAD,USD,LKR',
+                'source' => 'EUR',
+                'format' => 1
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (isset($data['success']) && $data['success']) {
+                    return response()->json([
+                        'success' => true,
+                        'rates' => $data['quotes']
+                    ]);
+                }
+            }
+
+            // Fallback rates if API fails
+            return response()->json([
+                'success' => true,
+                'rates' => [
+                    'EUREUR' => 1,
+                    'EURUSD' => 1.09,
+                    'EURGBP' => 0.86,
+                    'EURCAD' => 1.48,
+                    'EURLKR' => 330.5
+                ],
+                'fallback' => true
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Currency API Error: ' . $e->getMessage());
+
+            // Return fallback rates
+            return response()->json([
+                'success' => true,
+                'rates' => [
+                    'EUREUR' => 1,
+                    'EURUSD' => 1.09,
+                    'EURGBP' => 0.86,
+                    'EURCAD' => 1.48,
+                    'EURLKR' => 330.5
+                ],
+                'fallback' => true
+            ]);
+        }
+    }
 }

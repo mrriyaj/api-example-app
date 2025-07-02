@@ -68,6 +68,80 @@
     </div>
 
     <script>
+        // Global variable to store exchange rates
+        let exchangeRates = {};
+
+        // Fetch exchange rates from API
+        async function fetchExchangeRates() {
+            try {
+                const response = await fetch('{{ route('hotels.api.currency') }}');
+                const data = await response.json();
+
+                if (data.success) {
+                    exchangeRates = data.rates;
+                    console.log('Exchange rates loaded:', exchangeRates);
+                    if (data.fallback) {
+                        console.warn('Using fallback exchange rates');
+                    }
+                } else {
+                    console.error('Failed to fetch exchange rates');
+                    // Fallback rates if API fails
+                    exchangeRates = {
+                        'EUREUR': 1,
+                        'EURUSD': 1.09,
+                        'EURGBP': 0.86,
+                        'EURCAD': 1.48,
+                        'EURLKR': 330.5
+                    };
+                }
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+                // Fallback rates if API fails
+                exchangeRates = {
+                    'EUREUR': 1,
+                    'EURUSD': 1.09,
+                    'EURGBP': 0.86,
+                    'EURCAD': 1.48,
+                    'EURLKR': 330.5
+                };
+            }
+        } // Convert price to specific currency
+        function convertPrice(priceInEur, targetCurrency) {
+            if (!priceInEur || isNaN(priceInEur)) return 'N/A';
+
+            const rateKey = `EUR${targetCurrency}`;
+            const rate = exchangeRates[rateKey] || 1;
+            const convertedPrice = priceInEur * rate;
+
+            return convertedPrice.toFixed(2);
+        }
+
+        // Convert price to all currencies
+        function convertPriceToAllCurrencies(priceInEur) {
+            if (!priceInEur || isNaN(priceInEur)) {
+                return {
+                    EUR: 'N/A',
+                    USD: 'N/A',
+                    GBP: 'N/A',
+                    CAD: 'N/A',
+                    LKR: 'N/A'
+                };
+            }
+
+            return {
+                EUR: priceInEur.toFixed(2),
+                USD: convertPrice(priceInEur, 'USD'),
+                GBP: convertPrice(priceInEur, 'GBP'),
+                CAD: convertPrice(priceInEur, 'CAD'),
+                LKR: convertPrice(priceInEur, 'LKR')
+            };
+        }
+
+        // Load exchange rates when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchExchangeRates();
+        });
+
         async function searchRooms() {
             const form = document.getElementById('roomSearchForm');
             const formData = new FormData(form);
@@ -145,9 +219,18 @@
             html += '<tr>';
             html +=
                 '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Name</th>';
-            html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>';
             html +=
-            '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guests</th>';
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EUR Price</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">USD Price</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GBP Price</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CAD Price</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">LKR Price</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guests</th>';
             html +=
                 '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Occupancy</th>';
             html +=
@@ -173,13 +256,32 @@
                 const adults = room.nr_adults || 'N/A';
                 const children = room.nr_children || 0;
 
+                // Convert price to all currencies
+                const allPrices = convertPriceToAllCurrencies(price);
+
                 html += `
                     <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">${roomName}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-semibold text-green-600">${priceFormatted}</div>
+                            <div class="text-sm font-semibold text-green-600">€${allPrices.EUR}</div>
+                            <div class="text-xs text-gray-500">per night</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-blue-600">$${allPrices.USD}</div>
+                            <div class="text-xs text-gray-500">per night</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-purple-600">£${allPrices.GBP}</div>
+                            <div class="text-xs text-gray-500">per night</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-red-600">C$${allPrices.CAD}</div>
+                            <div class="text-xs text-gray-500">per night</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-orange-600">₨${allPrices.LKR}</div>
                             <div class="text-xs text-gray-500">per night</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
