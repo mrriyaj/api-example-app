@@ -1,33 +1,298 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hotel Room Search Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern Laravel application that allows users to search for hotel rooms with real-time currency conversion across multiple currencies. The application integrates with the Booking.com API for hotel data and provides multi-currency pricing using live exchange rates.
 
-## About Laravel
+## 🌟 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **Hotel Room Search**: Search for available hotel rooms using various parameters
+-   **Multi-Currency Display**: View prices in 5 currencies simultaneously (EUR, USD, GBP, CAD, LKR)
+-   **Real-Time Currency Conversion**: Live exchange rates from API Layer
+-   **Sample Data Fallback**: Shows sample data when external APIs are unavailable
+-   **Responsive Design**: Works seamlessly on desktop and mobile devices
+-   **User Authentication**: Built-in user registration and login system
+-   **Clean UI**: Modern, professional interface using Tailwind CSS
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🔧 Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **Framework**: Laravel 12.x
+-   **Frontend**: Blade Templates, Tailwind CSS, JavaScript
+-   **Authentication**: Laravel Breeze
+-   **PHP Version**: ^8.2
+-   **Database**: SQLite/MySQL (configurable)
+-   **HTTP Client**: Laravel HTTP Client (Guzzle)
 
-## Learning Laravel
+## 📋 Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   PHP 8.2 or higher
+-   Composer
+-   Node.js & NPM (for frontend assets)
+-   Git
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/api-example-app.git
+cd api-example-app
+```
+
+### 2. Install Dependencies
+
+```bash
+# Install PHP dependencies
+composer install
+
+# Install Node.js dependencies
+npm install
+
+# Build frontend assets
+npm run build
+```
+
+### 3. Environment Setup
+
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+```
+
+### 4. Configure Environment Variables
+
+Edit `.env` file and update the following:
+
+```env
+APP_NAME="Hotel Room Search"
+APP_URL=http://localhost:8000
+
+# Database Configuration
+DB_CONNECTION=sqlite
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=hotel_app
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# API Keys (if you have your own)
+BOOKING_API_KEY=your_booking_api_key_here
+CURRENCY_API_KEY=your_currency_api_key_here
+```
+
+### 5. Database Setup
+
+```bash
+# Run database migrations
+php artisan migrate
+
+# (Optional) Seed the database
+php artisan db:seed
+```
+
+### 6. Start the Development Server
+
+```bash
+php artisan serve
+```
+
+Visit `http://localhost:8000` to access the application.
+
+## 🎯 Usage
+
+### Hotel Room Search
+
+1. **Navigate to Hotels**: Go to `/hotels` or click "Hotel Rooms" in the navigation
+2. **Enter Search Parameters**:
+    - **Hotel ID**: Default is 74717 (you can change this)
+    - **Adults**: Number of adult guests (1-10)
+    - **Children Ages**: Comma-separated ages (e.g., "5,8")
+    - **Room Quantity**: Number of rooms needed (1-5)
+3. **Click "Search Rooms"**: View results in a comprehensive table
+
+### Currency Display
+
+The application automatically displays prices in all supported currencies:
+
+-   **EUR (€)**: Euro - Base currency
+-   **USD ($)**: US Dollar
+-   **GBP (£)**: British Pound
+-   **CAD (C$)**: Canadian Dollar
+-   **LKR (₨)**: Sri Lankan Rupee
+
+### Sample Data Mode
+
+When external APIs are unavailable, the application shows sample hotel data with a clear notification banner.
+
+## 🏗️ Project Structure
+
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── HotelController.php     # Main hotel logic
+│
+resources/
+├── views/
+│   ├── hotel/
+│   │   └── index.blade.php         # Hotel search interface
+│   └── layouts/
+│       └── app.blade.php           # Main layout
+│
+routes/
+└── web.php                         # Application routes
+
+public/
+├── build/                          # Compiled assets
+└── index.php                       # Entry point
+```
+
+## 🔌 API Endpoints
+
+### Public Routes
+
+-   `GET /` - Welcome page
+-   `GET /hotels` - Hotel search interface
+-   `GET /api/hotels/rooms` - Get hotel room data
+-   `GET /api/hotels/currency-rates` - Get exchange rates
+
+### Authentication Routes
+
+-   `GET /login` - Login page
+-   `GET /register` - Registration page
+-   `GET /dashboard` - User dashboard
+-   `GET /profile` - User profile management
+
+## 🌐 External APIs
+
+### Booking.com API
+
+-   **Endpoint**: `https://booking-com15.p.rapidapi.com/api/v1/hotels/getRoomList`
+-   **Purpose**: Fetch real hotel room data
+-   **Fallback**: Sample data when API is unavailable
+
+### Currency API (API Layer)
+
+-   **Endpoint**: `http://apilayer.net/api/live`
+-   **Purpose**: Get real-time exchange rates
+-   **Fallback**: Predefined exchange rates
+
+## 🛠️ Development
+
+### Running Tests
+
+```bash
+php artisan test
+```
+
+### Code Style
+
+```bash
+# Format code using Laravel Pint
+./vendor/bin/pint
+```
+
+### Frontend Development
+
+```bash
+# Watch for changes during development
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## 📱 Features in Detail
+
+### Hotel Controller Features
+
+-   **Simple Design**: Clean, easy-to-understand code structure
+-   **Error Handling**: Comprehensive error handling with user-friendly messages
+-   **Caching**: Built-in caching for better performance
+-   **Validation**: Input validation for all search parameters
+-   **Logging**: Detailed logging for debugging and monitoring
+
+### Frontend Features
+
+-   **Responsive Table**: Scrollable table that works on all screen sizes
+-   **Loading States**: Visual feedback during API calls
+-   **Error Messages**: Clear error notifications for users
+-   **Sample Data Notices**: Informative banners when showing fallback data
+-   **Color-Coded Currencies**: Each currency has distinct colors for easy identification
+
+### Currency Conversion
+
+-   **Live Rates**: Real-time exchange rate fetching
+-   **Multiple Currencies**: Support for 5 major currencies
+-   **Automatic Conversion**: Converts EUR base prices to all currencies
+-   **Fallback Rates**: Predefined rates when API is unavailable
+-   **Precise Calculations**: 2 decimal place precision for all conversions
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**1. API Rate Limiting (HTTP 429)**
+
+-   The application shows sample data when APIs are rate-limited
+-   Wait for the rate limit to reset or upgrade API plans
+
+**2. Missing Exchange Rates**
+
+-   Application uses fallback rates automatically
+-   Check currency API configuration in the controller
+
+**3. No Hotel Data**
+
+-   Verify the hotel ID is correct (default: 74717)
+-   Check if the Booking.com API is accessible
+-   Sample data will be shown if API fails
+
+**4. Frontend Assets Not Loading**
+
+-   Run `npm run build` to compile assets
+-   Check if Node.js and NPM are installed correctly
+
+### Logs
+
+Check application logs for detailed error information:
+
+```bash
+tail -f storage/logs/laravel.log
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## 👨‍💻 Author
+
+Created with ❤️ for learning and demonstration purposes.
+
+## 🙏 Acknowledgments
+
+-   [Laravel Framework](https://laravel.com/) - The web application framework
+-   [Booking.com API](https://rapidapi.com/apidojo/api/booking/) - Hotel data provider
+-   [API Layer](https://apilayer.com/) - Currency exchange rates
+-   [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+-   [Laravel Breeze](https://laravel.com/docs/starter-kits#laravel-breeze) - Authentication scaffolding
+
+## 📞 Support
+
+If you encounter any issues or have questions, please create an issue in the GitHub repository.
+
+---
+
+**Happy Coding! 🚀**
 
 ## Laravel Sponsors
 
@@ -35,14 +300,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **[Vehikl](https://vehikl.com)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Redberry](https://redberry.international/laravel-development)**
+-   **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 
