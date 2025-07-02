@@ -97,10 +97,10 @@
 
                 // Check for room data in the response
                 if (result.status && result.data && result.data.block && Array.isArray(result.data.block)) {
-                    displayRooms(result.data.block);
+                    displayRooms(result.data.block, result);
                 } else if (result.block && Array.isArray(result.block)) {
                     // Fallback for direct block structure
-                    displayRooms(result.block);
+                    displayRooms(result.block, result);
                 } else {
                     showError('No room data found or invalid response format');
                     console.error('Invalid response format:', result);
@@ -117,7 +117,7 @@
             errorDiv.classList.remove('hidden');
         }
 
-        function displayRooms(rooms) {
+        function displayRooms(rooms, metadata = {}) {
             const resultsDiv = document.getElementById('roomResults');
 
             if (!Array.isArray(rooms) || rooms.length === 0) {
@@ -125,11 +125,42 @@
                 return;
             }
 
-            let html = '<h3 class="text-lg font-medium text-gray-900 mb-4">Available Rooms (' + rooms.length +
-                ' options)</h3>';
-            html += '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+            let html = '';
 
-            rooms.forEach(room => {
+            // Show sample data notice if applicable
+            if (metadata.sample_data) {
+                html += '<div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">';
+                html += '<strong>Notice:</strong> ' + (metadata.message ||
+                    'Showing sample data because API is not available');
+                html += '</div>';
+            }
+
+            html += '<h3 class="text-lg font-medium text-gray-900 mb-4">Available Rooms (' + rooms.length +
+                ' options)</h3>';
+
+            // Create table instead of grid
+            html += '<div class="overflow-x-auto">';
+            html += '<table class="min-w-full bg-white border border-gray-200 rounded-lg">';
+            html += '<thead class="bg-gray-50">';
+            html += '<tr>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Name</th>';
+            html += '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>';
+            html +=
+            '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guests</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Occupancy</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Size</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Breakfast</th>';
+            html +=
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Refundable</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody class="bg-white divide-y divide-gray-200">';
+
+            rooms.forEach((room, index) => {
                 const price = room.product_price_breakdown?.gross_amount?.value || 'N/A';
                 const currency = room.product_price_breakdown?.gross_amount?.currency || 'EUR';
                 const priceFormatted = room.product_price_breakdown?.gross_amount?.amount_rounded ||
@@ -143,20 +174,37 @@
                 const children = room.nr_children || 0;
 
                 html += `
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                        <h4 class="font-semibold text-lg mb-3 text-blue-800">${roomName}</h4>
-                        <div class="space-y-2 text-sm text-gray-600">
-                            <p><strong>Price:</strong> <span class="text-green-600 font-semibold">${priceFormatted}</span> per night</p>
-                            <p><strong>Guests:</strong> ${adults} adults${children > 0 ? `, ${children} children` : ''}</p>
-                            <p><strong>Max Occupancy:</strong> ${maxOccupancy}</p>
-                            <p><strong>Room Size:</strong> ${roomSize} m²</p>
-                            <p><strong>Breakfast:</strong> ${breakfast}</p>
-                            <p><strong>Refundable:</strong> <span class="${refundable === 'Yes' ? 'text-green-600' : 'text-red-600'}">${refundable}</span></p>
-                        </div>
-                    </div>
+                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${roomName}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-semibold text-green-600">${priceFormatted}</div>
+                            <div class="text-xs text-gray-500">per night</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            ${adults} adults${children > 0 ? `, ${children} children` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            ${maxOccupancy}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            ${roomSize} m²
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            ${breakfast}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${refundable === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${refundable}
+                            </span>
+                        </td>
+                    </tr>
                 `;
             });
 
+            html += '</tbody>';
+            html += '</table>';
             html += '</div>';
             resultsDiv.innerHTML = html;
         }
