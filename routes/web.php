@@ -2,14 +2,19 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Public pages
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/home', [PageController::class, 'home']);
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+  return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Hotel routes
@@ -18,9 +23,9 @@ Route::get('/api/hotels/rooms', [HotelController::class, 'getRoomList'])->name('
 Route::get('/api/hotels/currency-rates', [HotelController::class, 'getCurrencyRates'])->name('hotels.api.currency');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+  Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+  Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';
